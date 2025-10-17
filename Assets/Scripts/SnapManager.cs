@@ -6,15 +6,24 @@ public class SnapManager : MonoBehaviour
     [Header("Snapping Settings")]
     public float snapDistance = 0.05f;
     public LayerMask snapPointLayer;
+    public Transform snapReceivers;
+
+    private List<Transform> snapReceiverList;
+
+    private void Start()
+    {
+        snapReceiverList = GetReceivers();
+    }
 
     public void TrySnap()
     {
-        List<Transform> receivers = GetReceivers();
         Transform bestReceiver = null;
         Transform bestSnapPoint = null;
         float closestDistance = float.MaxValue;
 
-        foreach (Transform receiver in receivers)
+        List<Transform> snapPoints = new List<Transform>();
+
+        foreach (Transform receiver in snapReceiverList)
         {
             Collider[] hits = Physics.OverlapSphere(receiver.position, snapDistance, snapPointLayer);
             foreach (Collider hit in hits)
@@ -22,11 +31,15 @@ public class SnapManager : MonoBehaviour
                 if (hit.CompareTag("SnapPoint"))
                 {
                     float distance = Vector3.Distance(receiver.position, hit.transform.position);
+
+                    snapPoints.Add(hit.transform);
+
                     if (distance < closestDistance)
                     {
                         closestDistance = distance;
                         bestReceiver = receiver;
                         bestSnapPoint = hit.transform;
+
                     }
                 }
             }
@@ -34,17 +47,29 @@ public class SnapManager : MonoBehaviour
 
         if (bestReceiver != null && bestSnapPoint != null)
         {
-            SnapWithFixedJoint(bestReceiver, bestSnapPoint);
+            Vector3 averagePosition = Vector3.zero;
+
+            Vector3 sum = Vector3.zero;
+            foreach (Transform item in snapPoints)
+            {
+                sum += item.position;
+
+                Debug.Log($"{item.name} is snapped to {this.name}.");
+            }
+
+            averagePosition = sum / snapPoints.Count;
+
+            SnapWithFixedJoint(bestReceiver, bestSnapPoint, averagePosition);
         }
     }
 
-    void SnapWithFixedJoint(Transform receiver, Transform snapPoint)
+    void SnapWithFixedJoint(Transform receiver, Transform snapPoint, Vector3 averagePosition)
     {
         Transform otherBrick = snapPoint.transform.root;
 
         // Align receiver to snapPoint without changing scale
         Vector3 receiverOffset = transform.position - receiver.position;
-        transform.position = snapPoint.position + receiverOffset;
+        transform.position = averagePosition + new Vector3(0f, 0.01f, 0f);
         transform.rotation = snapPoint.rotation;
 
         // Preserve scale — do NOT reset to Vector3.one
@@ -70,12 +95,9 @@ public class SnapManager : MonoBehaviour
     List<Transform> GetReceivers()
     {
         List<Transform> receivers = new List<Transform>();
-        foreach (Transform child in transform)
+        foreach (Transform child in snapReceivers)
         {
-            if (child.name.StartsWith("SnapReceiver"))
-            {
-                receivers.Add(child);
-            }
+            receivers.Add(child);
         }
         return receivers;
     }
