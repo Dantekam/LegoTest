@@ -7,6 +7,7 @@ public class SnapManager : MonoBehaviour
     public float snapDistance = 0.05f;
     public LayerMask snapPointLayer;
     public Transform snapReceivers;
+    public Transform model;
 
     private List<Transform> snapReceiverList;
 
@@ -48,28 +49,32 @@ public class SnapManager : MonoBehaviour
         if (bestReceiver != null && bestSnapPoint != null)
         {
             Vector3 averagePosition = Vector3.zero;
+            Vector3 averageLocalPostion = Vector3.zero;
 
             Vector3 sum = Vector3.zero;
+            Vector3 sumLocal = Vector3.zero;
             foreach (Transform item in snapPoints)
             {
                 sum += item.position;
+                sumLocal += item.localPosition;
 
                 Debug.Log($"{item.name} is snapped to {this.name}.");
             }
 
             averagePosition = sum / snapPoints.Count;
+            averageLocalPostion = sumLocal / snapPoints.Count;
 
-            SnapWithFixedJoint(bestReceiver, bestSnapPoint, averagePosition);
+            SnapWithFixedJoint(bestReceiver, bestSnapPoint, averagePosition, averageLocalPostion);
         }
     }
 
-    void SnapWithFixedJoint(Transform receiver, Transform snapPoint, Vector3 averagePosition)
+    void SnapWithFixedJoint(Transform receiver, Transform snapPoint, Vector3 averagePosition, Vector3 averageLocalPosition)
     {
         Transform otherBrick = snapPoint.transform.root;
 
-        // Align receiver to snapPoint without changing scale
-        Vector3 receiverOffset = transform.position - receiver.position;
+        model.localPosition = (averagePosition.x > 0? 1 : -1 ) * new Vector3(averageLocalPosition.x, 0, averageLocalPosition.z);
         transform.position = averagePosition + new Vector3(0f, 0.01f, 0f);
+
         transform.rotation = snapPoint.rotation;
 
         // Preserve scale — do NOT reset to Vector3.one

@@ -592,7 +592,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockId: f8766c17-aaf8-4b55-9431-de8deea83842
-  instanceId: 9e998979-0f0c-43a6-82ac-02d6e299f38b
+  instanceId: b70594b2-05ce-4495-b761-37817e8f5eb8
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: f8338144-8280-4ff6-9455-ae2bb9c20fe8
@@ -717,7 +717,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockId: 7358e191-33b7-43ca-b066-b2f00531ac66
-  instanceId: d8243456-5a9a-4afb-9b24-5ed63bddb4c4
+  instanceId: f17dbf39-bbe3-44a9-bb66-d06b333ac6ae
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -739,6 +739,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   snapReceivers: {fileID: 2776528660015169054}
+  model: {fileID: 808287675433151933}
 --- !u!54 &2979927083111395534
 Rigidbody:
   m_ObjectHideFlags: 0
