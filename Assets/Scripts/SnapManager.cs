@@ -39,25 +39,21 @@ public class SnapManager : MonoBehaviour
                         closestDistance = distance;
                         bestReceiver = receiver;
                         bestSnapPoint = hit.transform;
-
                     }
                 }
             }
         }
 
-        if (bestReceiver != null && bestSnapPoint != null)
+        if (bestReceiver != null && bestSnapPoint != null && snapPoints.Count > 0)
         {
-            Vector3 averagePosition = Vector3.zero;
-
             Vector3 sum = Vector3.zero;
             foreach (Transform item in snapPoints)
             {
                 sum += item.position;
-
                 Debug.Log($"{item.name} is snapped to {this.name}.");
             }
 
-            averagePosition = sum / snapPoints.Count;
+            Vector3 averagePosition = sum / snapPoints.Count;
 
             SnapWithFixedJoint(bestReceiver, bestSnapPoint, averagePosition);
         }
@@ -67,20 +63,36 @@ public class SnapManager : MonoBehaviour
     {
         Transform otherBrick = snapPoint.transform.root;
 
-        // Align receiver to snapPoint without changing scale
-        Vector3 receiverOffset = transform.position - receiver.position;
-        transform.position = averagePosition + new Vector3(0f, 0.01f, 0f);
-        transform.rotation = snapPoint.rotation;
+        // Get snapPoint’s position relative to its brick root
+        Vector3 localPos = otherBrick.InverseTransformPoint(snapPoint.position);
+        float offsetDist = 0.4f;
 
-        // Preserve scale — do NOT reset to Vector3.one
-        // Avoid parenting — use FixedJoint instead
+        Vector3 snapOffset = Vector3.zero;
+
+        // Detect which side/corner this snap point is on the bottom brick ideally
+        if (localPos.x > 0.2f)  snapOffset.x = offsetDist;   // right half
+        if (localPos.x < -0.2f) snapOffset.x = -offsetDist;  // left half
+        if (localPos.z > 0.2f)  snapOffset.z = offsetDist;   // top half
+        if (localPos.z < -0.2f) snapOffset.z = -offsetDist;  // bottom half
+
+        snapOffset = -snapOffset;
+
+        // Convert to world-space offset based on the bottom brick’s orientation recommendation from online
+        Vector3 worldOffset = otherBrick.TransformDirection(snapOffset);
+
+        // Calculate target position
+        Vector3 targetPos = averagePosition + worldOffset + new Vector3(0f, 0.01f, 0f);
+
+        // Align top brick hopefully
+        transform.position = targetPos;
+        transform.rotation = otherBrick.rotation;
 
         Rigidbody thisRb = GetComponent<Rigidbody>();
         Rigidbody otherRb = otherBrick.GetComponent<Rigidbody>();
 
         if (thisRb == null || otherRb == null)
         {
-            Debug.LogWarning("Both bricks must have Rigidbody components.");
+            Debug.LogWarning("Both bricks must have Rigidbody components to snap properly.");
             return;
         }
 
@@ -89,15 +101,16 @@ public class SnapManager : MonoBehaviour
         joint.breakForce = Mathf.Infinity;
         joint.breakTorque = Mathf.Infinity;
 
-        Debug.Log($"{gameObject.name} snapped to {otherBrick.name} using FixedJoint.");
+        Debug.Log($"{gameObject.name} snapped to {otherBrick.name} using FixedJoint with corrected offset.");
     }
 
     List<Transform> GetReceivers()
     {
         List<Transform> receivers = new List<Transform>();
-        foreach (Transform child in snapReceivers)
+        if (snapReceivers != null)
         {
-            receivers.Add(child);
+            foreach (Transform child in snapReceivers)
+                receivers.Add(child);
         }
         return receivers;
     }
@@ -105,9 +118,10 @@ public class SnapManager : MonoBehaviour
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
-        foreach (Transform receiver in GetReceivers())
+        if (snapReceivers != null)
         {
-            Gizmos.DrawWireSphere(receiver.position, snapDistance);
+            foreach (Transform receiver in snapReceivers)
+                Gizmos.DrawWireSphere(receiver.position, snapDistance);
         }
     }
 }
