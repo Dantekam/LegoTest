@@ -10,10 +10,13 @@ public class SnapManager : MonoBehaviour
     public Transform model;
 
     private List<Transform> snapReceiverList;
+    private List<Transform> usedReceivers;
+    private List<Transform> otherBrickSnap;
 
     private void Start()
     {
         snapReceiverList = GetReceivers();
+        usedReceivers = new List<Transform>();
     }
 
     public void TrySnap()
@@ -22,7 +25,7 @@ public class SnapManager : MonoBehaviour
         Transform bestSnapPoint = null;
         float closestDistance = float.MaxValue;
 
-        List<Transform> snapPoints = new List<Transform>();
+        List<Transform> otherBrickSnap = new List<Transform>();
 
         foreach (Transform receiver in snapReceiverList)
         {
@@ -33,7 +36,8 @@ public class SnapManager : MonoBehaviour
                 {
                     float distance = Vector3.Distance(receiver.position, hit.transform.position);
 
-                    snapPoints.Add(hit.transform);
+                    otherBrickSnap.Add(hit.transform);
+                    usedReceivers.Add(receiver);
 
                     if (distance < closestDistance)
                     {
@@ -53,7 +57,7 @@ public class SnapManager : MonoBehaviour
 
             Vector3 sum = Vector3.zero;
             Vector3 sumLocal = Vector3.zero;
-            foreach (Transform item in snapPoints)
+            foreach (Transform item in otherBrickSnap)
             {
                 sum += item.position;
                 sumLocal += item.localPosition;
@@ -61,21 +65,21 @@ public class SnapManager : MonoBehaviour
                 Debug.Log($"{item.name} is snapped to {this.name}.");
             }
 
-            averagePosition = sum / snapPoints.Count;
-            averageLocalPostion = sumLocal / snapPoints.Count;
+            averagePosition = sum / otherBrickSnap.Count;
+            averageLocalPostion = sumLocal / otherBrickSnap.Count;
 
-            SnapWithFixedJoint(bestReceiver, bestSnapPoint, averagePosition, averageLocalPostion);
+            SnapWithFixedJoint(bestReceiver, otherBrickSnap, averagePosition, averageLocalPostion);
         }
     }
 
-    void SnapWithFixedJoint(Transform receiver, Transform snapPoint, Vector3 averagePosition, Vector3 averageLocalPosition)
+    void SnapWithFixedJoint(Transform receiver, List<Transform> snapPointList, Vector3 averagePosition, Vector3 averageLocalPosition)
     {
-        Transform otherBrick = snapPoint.transform.root;
+        Transform otherBrick = snapPointList[0].transform.root;
 
         model.localPosition = (averagePosition.x > 0? 1 : -1 ) * new Vector3(averageLocalPosition.x, 0, averageLocalPosition.z);
         transform.position = averagePosition + new Vector3(0f, 0.01f, 0f);
 
-        transform.rotation = snapPoint.rotation;
+        transform.rotation = snapPointList[0].rotation;
 
         // Preserve scale — do NOT reset to Vector3.one
         // Avoid parenting — use FixedJoint instead
@@ -95,6 +99,16 @@ public class SnapManager : MonoBehaviour
         joint.breakTorque = Mathf.Infinity;
 
         Debug.Log($"{gameObject.name} snapped to {otherBrick.name} using FixedJoint.");
+
+        foreach (var receivers in usedReceivers)
+        {
+            receivers.gameObject.SetActive(false);
+        }
+
+        foreach (var snap in snapPointList)
+        {
+            snap.gameObject.SetActive(false);
+        }
     }
 
     List<Transform> GetReceivers()

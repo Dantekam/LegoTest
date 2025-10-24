@@ -446,7 +446,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2854302326352147535}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -455,7 +455,7 @@ Transform:
   - {fileID: 8079999279969041276}
   - {fileID: 2744133628613402419}
   - {fileID: 6169449696102284110}
-  m_Father: {fileID: 2537463182938600679}
+  m_Father: {fileID: 808287675433151933}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3333988133367715492
 GameObject:
@@ -534,7 +534,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4226346518939096828}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -543,7 +543,7 @@ Transform:
   - {fileID: 9156885312430780156}
   - {fileID: 1895634651738705013}
   - {fileID: 1886040373813476236}
-  m_Father: {fileID: 2537463182938600679}
+  m_Father: {fileID: 808287675433151933}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5494983053495171712
 GameObject:
@@ -592,7 +592,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockId: f8766c17-aaf8-4b55-9431-de8deea83842
-  instanceId: b70594b2-05ce-4495-b761-37817e8f5eb8
+  instanceId: 7ee218f1-f71b-47b2-ad22-92b7e1340394
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: f8338144-8280-4ff6-9455-ae2bb9c20fe8
@@ -700,8 +700,6 @@ Transform:
   m_Children:
   - {fileID: 808287675433151933}
   - {fileID: 1462088095321477308}
-  - {fileID: 5485437049728276488}
-  - {fileID: 2776528660015169054}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1708167099361164632
@@ -717,7 +715,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockId: 7358e191-33b7-43ca-b066-b2f00531ac66
-  instanceId: f17dbf39-bbe3-44a9-bb66-d06b333ac6ae
+  instanceId: e91d5f68-2fe4-4d7f-a65f-9c15bc04b833
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -895,6 +893,8 @@ Transform:
   m_Children:
   - {fileID: 5703289727683622717}
   - {fileID: 5488686754839671813}
+  - {fileID: 5485437049728276488}
+  - {fileID: 2776528660015169054}
   m_Father: {fileID: 2537463182938600679}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8227152061886073642
